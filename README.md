@@ -47,7 +47,7 @@ Retrieval evaluation and Words Analytics work without an API key.
 2. `ask_rag_google.py`
 - RAG with Google Gemini for generation via OpenAI SDK.
 - Uses local embeddings (`all-MiniLM-L6-v2`) + local ChromaDB (`chroma_db/`) to retrieve relevant chunks before asking the model.
-- Default retrieval uses `n_results=5` for the question: `What does this say about Denis?`
+- Currently points to the espresso-machine manual and retrieves `n_results=5` for the question: `What does error E47 mean and how do I fix it?`
 
 3. `ask_bm25_rag_google.py`
 - RAG with Google Gemini for generation via OpenAI SDK and in-memory BM25 lexical retrieval.
