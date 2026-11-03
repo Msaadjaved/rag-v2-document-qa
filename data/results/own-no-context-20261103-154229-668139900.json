@@ -1,0 +1,80 @@
+{
+  "corpus": "own",
+  "mode": "no-context",
+  "provider_base_url": "https://openrouter.ai/api/v1",
+  "model": "google/gemini-2.5-flash",
+  "results": [
+    {
+      "id": "OWN-01",
+      "question": "What is the capacity of the Vellora Duo water tank?",
+      "type": "exact_identifier",
+      "answer": "I'm not familiar with the \"Vellora Duo\" water tank and its capacity. It's possible it's a very specific or niche product I don't have information on."
+    },
+    {
+      "id": "OWN-02",
+      "question": "How long should the water filter be soaked before installation, and how long does it last?",
+      "type": "split_answer",
+      "answer": "You should soak a water filter for about 15 minutes before installation.\n\nA typical water filter for a refrigerator or pitcher usually lasts around 3 to 6 months."
+    },
+    {
+      "id": "OWN-03",
+      "question": "What should I do if coffee comes out drop by drop?",
+      "type": "different_vocabulary",
+      "answer": "If your coffee is coming out drop by drop, it usually means the grind is too fine. Here's what you should do:\n\n1.  **Stop the brewing process (if possible).**\n2.  **Adjust your grinder to a coarser setting.** Make a noticeable change, not just a tiny one.\n3.  **Discard the current coffee grounds.** They're likely over-extracted or will be.\n4.  **Clean your portafilter/brew basket.** Make sure there are no clogged holes.\n5.  **Re-grind your beans at the new, coarser setting.**\n6.  **Try brewing again.**\n\nIf it's still too slow, repeat the process of making the grind even coarser. If it starts flowing too fast, then you've gone too far and need to make it slightly finer. It's a balance!"
+    },
+    {
+      "id": "OWN-04",
+      "question": "Can I use vinegar to descale the machine?",
+      "type": "not_in_corpus_trap",
+      "answer": "Yes, you can use vinegar to descale most machines. It's a common and effective natural descaler."
+    },
+    {
+      "id": "OWN-05",
+      "question": "What are the two phases of the descaling programme?",
+      "type": "two_hops",
+      "answer": "I'm unsure about the specific terminology for the two phases of a descaling program without being able to look it up. However, based on general knowledge of how these programs work, I would anticipate them to be:\n\n1.  **The descaling agent application and reaction phase:** This is where the descaling solution is introduced to the system and allowed to circulate and react with the limescale.\n2.  **The rinsing phase:** After the descaling agent has had time to work, this phase involves flushing the system thoroughly with clean water to remove the descaling agent and any loosened scale."
+    },
+    {
+      "id": "OWN-06",
+      "question": "What is error E47 and how should it be fixed?",
+      "type": "exact_identifier",
+      "answer": "I'm unsure. I do not know what error E47 is or how to fix it."
+    },
+    {
+      "id": "OWN-07",
+      "question": "How often should the brewing unit be rinsed?",
+      "type": "different_vocabulary",
+      "answer": "I'm not sure of the exact recommended frequency for rinsing a brewing unit. It can vary depending on the specific type of machine and how often it's used."
+    },
+    {
+      "id": "OWN-08",
+      "question": "How much coffee grounds are used at strength level 5?",
+      "type": "split_answer",
+      "answer": "I'm afraid I can't give a precise answer to that question, as \"strength level 5\" isn't a standardized measurement across all coffee makers or brewing methods. Different machines, cup sizes, and even personal preferences would interpret that differently.\n\nHowever, I can tell you that generally, when someone refers to a \"strength level 5\" on a coffee machine, they are often implying a stronger brew than standard. This usually means the machine is designed to use **more coffee grounds per unit of water** than it would for a lower strength setting, or it might adjust the brewing time or temperature.\n\nWithout knowing the specific machine and its default settings, I can't give you an exact gram measurement."
+    },
+    {
+      "id": "OWN-09",
+      "question": "What temperature should the milk be for the best foam?",
+      "type": "exact_identifier",
+      "answer": "For the best foam, milk should be heated to a temperature between **140°F and 155°F (60°C and 68°C)**.\n\nIf it's too cold, you won't get enough volume or the right texture. If it's too hot, the proteins will denature too much, and the foam will be thin, watery, and lose its stability quickly, plus the milk will taste scalded."
+    },
+    {
+      "id": "OWN-10",
+      "question": "How much space should be left behind the machine for ventilation?",
+      "type": "exact_identifier",
+      "answer": "This is a great question, and the answer isn't a single number, as it depends on a few factors. However, I can give you a general idea and the reasoning behind it:\n\n**For most typical machines (e.g., computers, home appliances, general electronics):**\n\n*   **A few inches (3-6 inches or about 7-15 cm) is usually sufficient.** This allows for basic airflow.\n*   **The key is to avoid completely blocking the vents.** If there are vents on the back, ensure they have unobstructed space to draw in cool air and expel hot air.\n\n**Factors that increase the required space:**\n\n1.  **Heat Generation:**\n    *   **High-power devices:** Machines that generate a lot of heat (e.g., gaming PCs, servers, industrial equipment, high-wattage amplifiers, some laser printers) need more space. They have more powerful fans and require a larger volume of air to circulate effectively. For these, **6 inches to 1 foot (15-30 cm) or even more** might be recommended.\n    *   **Devices with specific cooling requirements:** Some devices might have manufacturer recommendations for minimum clearance.\n\n2.  **Ventilation Design:**\n    *   **Rear-facing vents:** If the primary exhaust vents are on the back, you need to ensure there's enough space for the hot air to dissipate without immediately being re-ingested by the machine or trapped against a wall.\n    *   **Side or top vents:** If the main vents are elsewhere, the rear clearance might be less critical for *active* airflow but still good for general heat dissipation.\n\n3.  **Environment:**\n    *   **Confined spaces:** If the machine is in an enclosed cabinet or a small recess, you'll need to be more generous with space, or even consider active cabinet ventilation (fans).\n    *   **Ambient temperature:** In a very hot room, better ventilation for the machine is even more important.\n\n**General Principle:**\n\nThe goal is to prevent a \"hot pocket\" of air from forming behind the machine. Air needs to be able to flow *through* the machine and away from it.\n\n**If unsure:**\n\n*   **When in doubt, err on the side of more space.** A little extra room for airflow never hurts and can extend the life of your machine.\n*   **Feel the air:** After the machine has been running for a while, carefully feel the air coming out of the vents. If it feels extremely hot and stagnant right behind the machine, you likely need more space."
+    },
+    {
+      "id": "OWN-11",
+      "question": "Does the machine support a Wi-Fi connection?",
+      "type": "different_vocabulary",
+      "answer": "I'm unsure. To answer that question, I would need to know what specific \"machine\" you are referring to. Many modern machines do, but it's not universal."
+    },
+    {
+      "id": "OWN-12",
+      "question": "What is the warranty duration for the Vellora Duo?",
+      "type": "not_in_corpus",
+      "answer": "I'm sorry, but I don't have enough information to answer that question. I haven't encountered a product called \"Vellora Duo\" in my training data, so I can't provide details about its warranty."
+    }
+  ]
+}

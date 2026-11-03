@@ -1,0 +1,12 @@
+{"id":"OWN-01","question":"What is the capacity of the Vellora Duo water tank?","type":"exact_identifier","answerable":true,"answer_quote":"water tank (1.8 litres)"}
+{"id":"OWN-02","question":"How long should the water filter be soaked before installation, and how long does it last?","type":"split_answer","answerable":true,"answer_quote":"soak the filter in cold water for one minute"}
+{"id":"OWN-03","question":"What should I do if coffee comes out drop by drop?","type":"different_vocabulary","answerable":true,"answer_quote":"the grind is too fine"}
+{"id":"OWN-04","question":"Can I use vinegar to descale the machine?","type":"not_in_corpus_trap","answerable":true,"answer_quote":"Never use vinegar or any other product than the recommended descaling liquid."}
+{"id":"OWN-05","question":"What are the two phases of the descaling programme?","type":"two_hops","answerable":true,"answer_quote":"the descaling phase, then a rinsing phase"}
+{"id":"OWN-06","question":"What is error E47 and how should it be fixed?","type":"exact_identifier","answerable":true,"answer_quote":"E47 - Grinder blocked by a foreign object."}
+{"id":"OWN-07","question":"How often should the brewing unit be rinsed?","type":"different_vocabulary","answerable":true,"answer_quote":"Every week, remove the brewing unit and rinse it under lukewarm running water."}
+{"id":"OWN-08","question":"How much coffee grounds are used at strength level 5?","type":"split_answer","answerable":true,"answer_quote":"between 7 and 14 grams"}
+{"id":"OWN-09","question":"What temperature should the milk be for the best foam?","type":"exact_identifier","answerable":true,"answer_quote":"around 5 degrees Celsius"}
+{"id":"OWN-10","question":"How much space should be left behind the machine for ventilation?","type":"exact_identifier","answerable":true,"answer_quote":"Leave at least 10 centimetres between the back of the machine and the wall."}
+{"id":"OWN-11","question":"Does the machine support a Wi-Fi connection?","type":"different_vocabulary","answerable":true,"answer_quote":"The machine can still be used without the app."}
+{"id":"OWN-12","question":"What is the warranty duration for the Vellora Duo?","type":"exact_identifier","answerable":true,"answer_quote":"The Vellora Duo is covered by a two-year warranty from the date of purchase, on presentation of the receipt."}

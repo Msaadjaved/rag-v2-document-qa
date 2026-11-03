@@ -1,0 +1,68 @@
+{
+  "corpus": "own",
+  "mode": "no-context",
+  "provider_base_url": "https://openrouter.ai/api/v1",
+  "model": "google/gemini-2.5-flash",
+  "results": [
+    {
+      "id": "OWN-01",
+      "question": "What is the capacity of the Vellora Duo water tank?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-02",
+      "question": "How long should the water filter be soaked before installation, and how long does it last?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-03",
+      "question": "What should I do if coffee comes out drop by drop?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-04",
+      "question": "Can I use vinegar to descale the machine?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-05",
+      "question": "What are the two phases of the descaling programme?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-06",
+      "question": "What is error E47 and how should it be fixed?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-07",
+      "question": "How often should the brewing unit be rinsed?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-08",
+      "question": "How much coffee grounds are used at strength level 5?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-09",
+      "question": "What temperature should the milk be for the best foam?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-10",
+      "question": "How much space should be left behind the machine for ventilation?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-11",
+      "question": "Does the machine support a Wi-Fi connection?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    },
+    {
+      "id": "OWN-12",
+      "question": "What is the warranty duration for the Vellora Duo?",
+      "error": "Error code: 402 - This request requires more credits, or fewer max_tokens. You requested up to 65535 tokens, but can only afford 15001. To increase, visit https://openrouter.ai/workspaces/default/keys/021e612867a768764b40ae3217f23e04afa28d584376389a0bbba9238ea88ec4 and adjust the key's total limit"
+    }
+  ]
+}
