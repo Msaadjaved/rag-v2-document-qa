@@ -1,9 +1,11 @@
 """Core RAG, corpus, words analytics and evaluation logic for RAG V2."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +14,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DOCS = ROOT / "docs"
+INDEX_DIR = DATA / "index"  # derived data (BM25 index, embeddings): git-ignored
 
 load_dotenv(ROOT / ".env")
 
@@ -104,34 +107,75 @@ def build_chunks(
     return records
 
 
+def records_fingerprint(records: list[dict[str, Any]], extra: str = "") -> str:
+    """Stable hash of the chunk list (ids + texts, in order) and of any extra
+    parameters. Used to know when a persisted index is stale: upload, delete,
+    selection change, new chunk size or new overlap all change the fingerprint."""
+    h = hashlib.sha256()
+    h.update(extra.encode("utf-8"))
+    h.update(b"\x02")
+    for r in records:
+        h.update(r["id"].encode("utf-8"))
+        h.update(b"\x00")
+        h.update(r["text"].encode("utf-8"))
+        h.update(b"\x01")
+    return h.hexdigest()
+
+
+DENSE_MODEL_NAME = "all-MiniLM-L6-v2"
+_MODEL = None
+
+
+def get_embedding_model():
+    """Load the sentence-transformers model once per process."""
+    global _MODEL
+    if _MODEL is None:
+        from sentence_transformers import SentenceTransformer
+
+        _MODEL = SentenceTransformer(DENSE_MODEL_NAME)
+    return _MODEL
+
+
 class Retriever:
-    """Uses SentenceTransformers when available, otherwise TF-IDF."""
+    """Dense retriever (SentenceTransformers), with a TF-IDF fallback.
+
+    strict=True raises instead of silently falling back to TF-IDF: use it for
+    every evaluation, otherwise "dense" numbers may really be TF-IDF numbers.
+    cache_key enables an on-disk embedding cache (data/index/dense-<key>.npz),
+    validated by a fingerprint of the chunks.
+    """
 
     def __init__(
         self,
         records: list[dict[str, Any]],
-        backend: str = "auto"
+        backend: str = "auto",
+        strict: bool = False,
+        cache_key: str | None = None
     ):
         self.records = records
         self.backend = "tfidf"
         self.model = None
         self.matrix = None
+        self.cache_hit = False
+        self.build_seconds = 0.0
+        started = time.perf_counter()
 
         if records and backend != "tfidf":
             try:
-                from sentence_transformers import SentenceTransformer
-
-                self.model = SentenceTransformer("all-MiniLM-L6-v2")
-
-                self.matrix = self.model.encode(
-                    [r["text"] for r in records],
-                    normalize_embeddings=True
-                )
-
+                self.model = get_embedding_model()
+                self.matrix, self.cache_hit = self._embeddings(cache_key)
                 self.backend = "sentence-transformers"
 
-            except Exception:
+            except Exception as exc:
                 self.model = None
+                self.matrix = None
+
+                if strict:
+                    raise RuntimeError(
+                        "Dense backend unavailable (sentence-transformers "
+                        f"failed: {exc}). Refusing the TF-IDF fallback in "
+                        "strict mode."
+                    ) from exc
 
         if self.backend == "tfidf" and records:
             from sklearn.feature_extraction.text import TfidfVectorizer
@@ -147,7 +191,43 @@ class Retriever:
             )
 
             self._cosine = cosine_similarity
-        print(f"Retriever backend selected: {self.backend}")
+
+        self.build_seconds = time.perf_counter() - started
+        print(
+            f"Retriever backend selected: {self.backend} "
+            f"(embedding cache hit: {self.cache_hit}, "
+            f"{self.build_seconds:.2f}s)"
+        )
+
+    def _embeddings(self, cache_key: str | None):
+        import numpy as np
+
+        fingerprint = records_fingerprint(self.records, DENSE_MODEL_NAME)
+        path = INDEX_DIR / f"dense-{cache_key}.npz" if cache_key else None
+
+        if path is not None and path.exists():
+            try:
+                with np.load(path, allow_pickle=False) as z:
+                    if str(z["fingerprint"]) == fingerprint:
+                        return z["matrix"], True
+            except Exception:
+                pass  # unreadable cache: just recompute
+
+        matrix = self.model.encode(
+            [r["text"] for r in self.records],
+            normalize_embeddings=True
+        )
+
+        if path is not None:
+            try:
+                INDEX_DIR.mkdir(parents=True, exist_ok=True)
+                tmp = path.with_name(path.name + ".tmp.npz")
+                np.savez(tmp, matrix=matrix, fingerprint=np.array(fingerprint))
+                os.replace(tmp, path)
+            except OSError:
+                pass  # cache is an optimisation, never a failure
+
+        return matrix, False
 
     def search(self, query: str, k: int = 5) -> list[dict[str, Any]]:
         if not self.records:
@@ -177,6 +257,39 @@ class Retriever:
             {**self.records[i], "score": float(scores[i])}
             for i in indexes
         ]
+
+
+_DENSE_CACHE: dict[tuple, tuple[str, Retriever]] = {}
+
+
+def get_dense(
+    corpus: str,
+    size: int,
+    overlap: int,
+    records: list[dict[str, Any]] | None = None,
+    strict: bool = False
+) -> Retriever:
+    """Return a cached dense retriever, rebuilt only if the chunks changed."""
+    if records is None:
+        records = build_chunks(corpus, size, overlap)
+
+    fingerprint = records_fingerprint(records, DENSE_MODEL_NAME)
+    key = (corpus, size, overlap)
+    cached = _DENSE_CACHE.get(key)
+
+    if cached and cached[0] == fingerprint and (
+        cached[1].backend == "sentence-transformers" or not strict
+    ):
+        return cached[1]
+
+    retriever = Retriever(
+        records,
+        strict=strict,
+        cache_key=f"{safe_name(corpus)}-{size}-{overlap}"
+    )
+    _DENSE_CACHE[key] = (fingerprint, retriever)
+
+    return retriever
 
 
 def words_for_corpus(
@@ -280,6 +393,15 @@ def generate_answer(
     retrieved: list[dict[str, Any]]
 ) -> str:
     """Generate a grounded answer using the configured OpenAI-compatible API."""
+    return generate_answer_with_usage(question, retrieved)[0]
+
+
+def generate_answer_with_usage(
+    question: str,
+    retrieved: list[dict[str, Any]]
+) -> tuple[str, dict[str, Any]]:
+    """Same as generate_answer, plus {"llm_calls", "prompt_tokens",
+    "completion_tokens", "latency_s"} for cost reporting."""
 
     load_dotenv(ROOT / ".env")
 
@@ -317,6 +439,8 @@ def generate_answer(
         + question
     )
 
+    started = time.perf_counter()
+
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -324,6 +448,17 @@ def generate_answer(
         ],
         max_tokens=2048
     )
+
+    usage_obj = getattr(response, "usage", None)
+
+    usage = {
+        "llm_calls": 1,
+        "prompt_tokens": int(getattr(usage_obj, "prompt_tokens", 0) or 0),
+        "completion_tokens": int(
+            getattr(usage_obj, "completion_tokens", 0) or 0
+        ),
+        "latency_s": time.perf_counter() - started
+    }
 
     content = response.choices[0].message.content or "{}"
 
@@ -344,10 +479,10 @@ def generate_answer(
             if isinstance(citation, str) and citation in allowed
         ]
 
-        return json.dumps(data, ensure_ascii=False)
+        return json.dumps(data, ensure_ascii=False), usage
 
     except (json.JSONDecodeError, ValueError):
         return json.dumps({
             "answer": content,
             "citations": []
-        }, ensure_ascii=False)
+        }, ensure_ascii=False), usage
