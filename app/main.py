@@ -22,7 +22,6 @@ from .core import (
     build_chunks,
     read_corpus,
     load_questions,
-    Retriever,
     generate_answer,
     generate_answer_with_usage,
     words_for_corpus,
@@ -32,6 +31,7 @@ from .core import (
 )
 
 from .bm25 import get_bm25
+from .evaluation import evaluate_corpus
 from .retrieval import (
     RETRIEVERS,
     RetrieverUnavailable,
@@ -70,6 +70,11 @@ class EvalRequest(BaseModel):
     overlap: int = Field(default=10, ge=0, le=89)
     top_k: int = Field(default=5, ge=1, le=20)
     generate_answers: bool = False
+    retrievers: list[RetrieverName] = Field(default_factory=default_retrievers)
+    rrf_k: int = Field(default=60, ge=1, le=1000)
+    candidates: int = Field(default=30, ge=1, le=200)
+    # True: fail instead of silently measuring TF-IDF when MiniLM cannot load.
+    strict_dense: bool = False
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -360,178 +365,22 @@ def questions(corpus: Literal["kestrel", "own"]):
 
 @app.post("/api/evaluate")
 def evaluate(req: EvalRequest):
-    questions = load_questions(req.corpus)
-
-    records = build_chunks(
-        req.corpus,
-        req.chunk_size,
-        req.overlap
-    )
-
-    if not records:
-        raise HTTPException(
-            400,
-            "No corpus documents found. Upload the corpus first."
+    try:
+        result = evaluate_corpus(
+            req.corpus,
+            req.chunk_size,
+            req.overlap,
+            req.top_k,
+            req.retrievers,
+            generate_answers=req.generate_answers,
+            rrf_k=req.rrf_k,
+            candidates=req.candidates,
+            strict_dense=req.strict_dense
         )
-
-    if not questions:
-        raise HTTPException(
-            400,
-            f"No question set found at data/questions/{req.corpus}.jsonl"
-        )
-
-    retriever = Retriever(records)
-    rows = []
-
-    for q in questions:
-
-        # Retrieve once, with enough results for all evaluation cutoffs.
-        all_hits = retriever.search(
-            q["question"],
-            max(req.top_k, 10)
-        )
-
-        # Keep configured top_k for answer generation and stored retrieval.
-        hits = all_hits[:req.top_k]
-
-        evidence = q.get("evidence", [])
-
-        quotes = [
-            str(item.get("quote", "")).strip().lower()
-            for item in evidence
-            if isinstance(item, dict)
-        ]
-
-        legacy_quote = str(
-            q.get("answer_quote", "")
-        ).strip().lower()
-
-        if legacy_quote:
-            quotes.append(legacy_quote)
-
-        relevant = []
-
-        for record in records:
-            matching_quotes = [
-                quote for quote in quotes
-                if quote and quote in record["text"].lower()
-            ]
-
-            matching_sources = {
-                str(item.get("source", ""))
-                for item in evidence
-                if (
-                    isinstance(item, dict)
-                    and str(item.get("quote", "")).strip().lower()
-                    in matching_quotes
-                )
-            }
-
-            if matching_quotes and (
-                not matching_sources
-                or record["document"] in matching_sources
-            ):
-                relevant.append(record)
-
-        relevant_ids = {r["id"] for r in relevant}
-
-        # Configured top_k retrieval hit.
-        retrieved_ids = {r["id"] for r in hits}
-
-        row = {
-            "id": q.get("id"),
-            "question": q["question"],
-            "type": q.get("type", "unspecified"),
-            "answerable": bool(q.get("answerable", True)),
-            "relevant_chunk_ids": sorted(relevant_ids),
-            "retrieved": [
-                {
-                    k: r[k]
-                    for k in ["id", "document", "index", "score", "text"]
-                }
-                for r in hits
-            ],
-            "hit_at_k": (
-                bool(relevant_ids & retrieved_ids)
-                if q.get("answerable", True)
-                else None
-            )
-        }
-
-        # Calculate all cutoffs from the SAME ranked retrieval result.
-        # This guarantees nested and consistent Hit@k values.
-        for n in (1, 3, 5, 10):
-            top_ids = {
-                r["id"] for r in all_hits[:n]
-            }
-
-            row[f"hit_at_{n}"] = (
-                bool(relevant_ids & top_ids)
-                if q.get("answerable", True)
-                else None
-            )
-
-        if req.generate_answers:
-            try:
-                row["generated_answer"] = json.loads(
-                    generate_answer(q["question"], hits)
-                )
-            except Exception as e:
-                row["generation_error"] = str(e)
-
-        rows.append(row)
-
-    answerable = [
-        r for r in rows if r["answerable"]
-    ]
-
-    hit_rates = {}
-
-    for n in (1, 3, 5, 10):
-        hit_rates[f"hit_rate_at_{n}"] = (
-            sum(r[f"hit_at_{n}"] for r in answerable)
-            / len(answerable)
-            if answerable else None
-        )
-
-    by_type = {}
-
-    for question_type in sorted({
-        r["type"] for r in answerable
-    }):
-        typed_rows = [
-            r for r in answerable
-            if r["type"] == question_type
-        ]
-
-        by_type[question_type] = {
-            "count": len(typed_rows),
-            **{
-                f"hit_rate_at_{n}": (
-                    sum(r[f"hit_at_{n}"] for r in typed_rows)
-                    / len(typed_rows)
-                )
-                for n in (1, 3, 5, 10)
-            }
-        }
-
-    summary = {
-        "corpus": req.corpus,
-        "config": {
-            "chunk_size": req.chunk_size,
-            "overlap": req.overlap,
-            "top_k": req.top_k,
-            "retriever": retriever.backend
-        },
-        "total_questions": len(rows),
-        "answerable_questions": len(answerable),
-        "hit_rates": hit_rates,
-        "hit_rate_at_k": (
-            sum(r["hit_at_k"] for r in answerable) / len(answerable)
-            if answerable else None
-        ),
-        "by_type": by_type
-    }
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except (RetrieverUnavailable, RuntimeError) as e:
+        raise HTTPException(503, str(e))
 
     stamp = (
         time.strftime("%Y%m%d-%H%M%S")
@@ -540,14 +389,10 @@ def evaluate(req: EvalRequest):
 
     path = DATA / "results" / f"{req.corpus}-{stamp}.json"
 
-    save_json(path, {
-        "summary": summary,
-        "results": rows
-    })
+    save_json(path, result)
 
     return {
-        "summary": summary,
-        "results": rows,
+        **result,
         "saved_to": str(path.relative_to(ROOT))
     }
 
@@ -643,5 +488,5 @@ def results():
             "file": p.name,
             "path": str(p.relative_to(ROOT))
         }
-        for p in sorted(folder.glob("*.json"))
+        for p in sorted(folder.rglob("*.json"))
     ] if folder.exists() else []
