@@ -30,7 +30,7 @@ from .core import (
     save_json
 )
 
-app = FastAPI(title="RAG V2", version="2.0.0")
+app = FastAPI(title="RAG V3", version="3.0.0")
 
 app.mount(
     "/static",
@@ -567,14 +567,3 @@ def results():
         }
         for p in sorted(folder.glob("*.json"))
     ] if folder.exists() else []
-
-
-@app.get("/about", response_class=HTMLResponse)
-def about():
-    return (
-        '<!doctype html><html><body style="font-family:system-ui;padding:8vw">'
-        '<h1 style="font-size:clamp(2rem,6vw,5rem)">'
-        'Denis Amselemovitch is an intriguing character who likes to make '
-        'impromptu appearances in incongruous places.'
-        '</h1></body></html>'
-    )
