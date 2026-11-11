@@ -24,10 +24,20 @@ from .core import (
     load_questions,
     Retriever,
     generate_answer,
+    generate_answer_with_usage,
     words_for_corpus,
     question_words,
     safe_name,
     save_json
+)
+
+from .bm25 import get_bm25
+from .retrieval import (
+    RETRIEVERS,
+    RetrieverUnavailable,
+    default_retrievers,
+    graph_available,
+    retrieve
 )
 
 app = FastAPI(title="RAG V3", version="3.0.0")
@@ -39,12 +49,19 @@ app.mount(
 )
 
 
+RetrieverName = Literal["dense", "bm25", "graph"]
+
+
 class AskRequest(BaseModel):
     corpus: Literal["kestrel", "own"] = "own"
     question: str = Field(min_length=2, max_length=4000)
     chunk_size: int = Field(default=800, ge=100, le=10000)
     overlap: int = Field(default=10, ge=0, le=89)
     top_k: int = Field(default=5, ge=1, le=20)
+    # Which retrievers are switched on. Several on => RRF fusion.
+    retrievers: list[RetrieverName] = Field(default_factory=default_retrievers)
+    rrf_k: int = Field(default=60, ge=1, le=1000)
+    candidates: int = Field(default=30, ge=1, le=200)
 
 
 class EvalRequest(BaseModel):
@@ -208,6 +225,33 @@ def delete_document(
     return {"deleted": path.name}
 
 
+@app.get("/api/config")
+def config():
+    return {
+        "retrievers": list(RETRIEVERS),
+        "available": {
+            "dense": True,
+            "bm25": True,
+            "graph": graph_available()
+        },
+        "default": default_retrievers(),
+        "graph_corpora": ["kestrel"]
+    }
+
+
+@app.post("/api/index/{corpus}/rebuild")
+def rebuild_index(
+    corpus: Literal["kestrel", "own"],
+    chunk_size: int = 800,
+    overlap: int = 10
+):
+    """Force a BM25 rebuild (it is normally rebuilt automatically when the
+    documents, their selection, or the chunking change)."""
+    retriever = get_bm25(corpus, chunk_size, overlap, force=True)
+
+    return retriever.info
+
+
 @app.post("/api/ask")
 def ask(req: AskRequest):
     records = build_chunks(
@@ -222,15 +266,42 @@ def ask(req: AskRequest):
             f"No documents found for {req.corpus}. Upload the corpus documents first."
         )
 
-    retriever = Retriever(records)
-    hits = retriever.search(req.question, req.top_k)
+    try:
+        out = retrieve(
+            req.corpus,
+            req.question,
+            req.chunk_size,
+            req.overlap,
+            req.retrievers,
+            depth=req.top_k,
+            candidates=req.candidates,
+            rrf_k=req.rrf_k,
+            records=records
+        )
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except RetrieverUnavailable as e:
+        raise HTTPException(503, str(e))
+
+    hits = out["hits"]
 
     try:
-        raw = generate_answer(req.question, hits)
+        raw, gen_usage = generate_answer_with_usage(req.question, hits)
         answer = json.loads(raw)
 
     except Exception as e:
         raise HTTPException(503, str(e))
+
+    usage = {
+        "llm_calls": out["usage"]["llm_calls"] + gen_usage["llm_calls"],
+        "prompt_tokens": (
+            out["usage"]["prompt_tokens"] + gen_usage["prompt_tokens"]
+        ),
+        "completion_tokens": (
+            out["usage"]["completion_tokens"] + gen_usage["completion_tokens"]
+        ),
+        "generation_latency_s": gen_usage["latency_s"]
+    }
 
     return {
         "answer": answer["answer"],
@@ -240,7 +311,14 @@ def ask(req: AskRequest):
             if hit["id"] in answer["citations"]
         ],
         "retrieved": hits,
-        "backend": retriever.backend
+        "retrievers": out["retrievers"],
+        "backend": ", ".join(
+            f"{name}={detail if isinstance(detail, str) else detail.get('index')}"
+            for name, detail in out["backend"].items()
+        ),
+        "graph_path": out["graph_path"],
+        "timings": out["timings"],
+        "usage": usage
     }
 
 
