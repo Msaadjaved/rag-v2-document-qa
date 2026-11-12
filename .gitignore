@@ -31,3 +31,6 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Derived indexes (BM25, embeddings): rebuilt automatically
+data/index/
