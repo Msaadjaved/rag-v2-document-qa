@@ -47,8 +47,11 @@ the path: entities found in the question, edges followed, and the chunks they ca
 
 ## Concept graph (Kestrel)
 
-> **TODO (graph owner): fill in this section.** Required by the assignment: how to build the graph (command, models/keys needed),
-> where it is stored, how long it takes and what it costs.
+> **Status: the concept graph is not implemented in this submission** (see `REPORT.md` section 6). There is no graph build command,
+> the third required configuration (`dense+bm25+graph`) was not run, and the graph checkbox stays disabled in the UI.
+> What is in place for it: the retriever contract below, the switches in the UI/API/evaluation command (`--retrievers ...,graph`),
+> the graph-path panel in the UI, and the Kestrel `two_hop` questions with one evidence quote per hop. Dropping an
+> `app/graph_retriever.py` that follows the contract enables everything else without further changes.
 
 Integration contract, so the graph plugs into fusion, UI and evaluation: `app/graph_retriever.py` must expose
 

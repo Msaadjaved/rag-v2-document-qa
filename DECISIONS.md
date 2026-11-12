@@ -1,6 +1,6 @@
 # Decision log (V3)
 
-Format: decision, options considered, choice and why. Entries marked **TODO** are for the graph owner / for after the runs.
+Format: decision, options considered, choice and why. D-12 records that the concept graph was not implemented.
 V2 decisions (chunk size, overlap, top-k, embedding model) are in `docs/REPORT_V2.md`.
 
 ## Fusion
@@ -90,9 +90,11 @@ Known weakness of q12: its first two hops sit in the same chunk, so a retriever 
 **D-11. Integration.** The graph is a retriever like the others: `search(...)` returns ranked chunk ids, a path for the UI and its
 query-time cost (contract in `app/retrieval.py` and the README). Chunk ids depend on chunking, so the graph is built on 800/10.
 
-**D-12 to D-16. TODO (graph owner):** schema (fixed vs open types, why), validation and what happens on invalid LLM output,
-entity resolution (method; one right merge, one wrong or missed merge), retrieval strategy (and the alternatives rejected: entity-
-neighbourhood expansion, path search, community summaries as in GraphRAG, LightRAG-style dual-level retrieval), models/keys/cost.
+**D-12. Graph not implemented.** Schema, validation, entity resolution, retrieval strategy and build cost were not decided or measured:
+the graph was not finished in the time we had. We chose to submit a complete, measured BM25 + fusion + evaluation instead of an
+unmeasured graph. The decisions that remain open, for whoever continues: fixed or open entity/relation types, what to do with LLM output
+that fails validation, how to merge aliases (q12: mailman → postroom), and how to turn a question into ranked chunks
+(entity-neighbourhood expansion, path search, GraphRAG community summaries, LightRAG-style dual-level retrieval).
 
 ## Process
 
@@ -109,4 +111,9 @@ are not visible on the slide, unless confirmed by the teacher.
    KST-07 persists as a generation problem, not a retrieval one).
 4. Gold chunks are found by quote matching: a quote cut by a chunk boundary yields no gold chunk (flagged, not hidden).
 5. q12's hops 1 and 2 share a chunk (D-10).
-6. **TODO after the runs:** the question where adding a retriever made things worse, graph failures, one bad triple and its cost.
+6. Rank-only fusion lets a chunk found by two retrievers outrank a correct chunk found by one, even when its second vote comes from deep
+   in a list: Kestrel q05 (dense #1, BM25 absent) fell from rank 1 to 6 with 30 candidates; limiting to 10 candidates brings it back to
+   rank 2 (D-18), still not rank 1. `split_answer` Recall@3 stays at 0.38 with BM25 on (q03 loses a hop to chunks BM25 promotes).
+7. `two_hop` Recall stays at 0.56 at k = 5 and 0.72 at k = 10 with dense, with or without BM25: finding every hop of a chain needs
+   something that follows relations between chunks (the missing graph).
+8. The concept graph is not implemented (D-12).
