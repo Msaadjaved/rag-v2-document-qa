@@ -8,11 +8,20 @@ V2 decisions (chunk size, overlap, top-k, embedding model) are in `docs/REPORT_V
 **D-01. How to combine retrievers.** Options: (a) weighted sum of normalised scores (min-max / z-score), (b) RRF, (c) a learned
 re-ranker / cross-encoder, (d) interleaving. **Chosen: RRF.** Cosine similarity, BM25 and graph scores are on different scales
 and BM25 scores are unbounded; RRF uses ranks only, needs no tuning data (we have 22 questions) and is the standard baseline.
-k = 60 (original paper); each retriever contributes its top `candidates` = 30. A cross-encoder would add a model and per-query
+k = 60 (original paper); each retriever contributes its top `candidates` = 10 (D-18). A cross-encoder would add a model and per-query
 cost we cannot justify on corpora of 43 and 78 chunks. Weighted RRF is supported (`--weights`) but plain RRF is the default.
 
 **D-02. One retriever on = no fusion.** The ranking is returned as is, so the `dense` configuration reproduces V2 exactly.
 Zero-score BM25 chunks are never returned: they carry no evidence and would enter the fusion as noise.
+
+**D-18. How many candidates each retriever gives to the fusion (default 10, was 30).** With 30, a chunk that dense ranks 16th to
+29th (cosine 0.05 to 0.15, i.e. noise) still earns an RRF vote, and if BM25 also returns it, "found by both" outscores a correct
+chunk found by one retriever only. Kestrel q05 showed it: gold chunk dense #1, absent from BM25, pushed to rank 6 by five such chunks
+(REPORT section 9). Options measured on Kestrel (10 answerable questions, k = 3 / 5, Hit and Recall):
+dense alone 0.80 / 0.90 and 0.72 / 0.77; plain RRF with 30 candidates 0.80 / 0.90 and 0.54 / 0.69; weights dense=2 bm25=1 with 30
+candidates 0.70 / 0.90 and 0.54 / 0.77; **10 candidates 0.90 / 1.00 and 0.64 / 0.79**. Caveat: the value was chosen after looking at q05,
+on the same 10 questions it is evaluated on, so the gain is optimistic; we have no held-out set. Other levers not tried:
+RRF k below 60, a score threshold on dense, a cross-encoder re-ranker.
 
 ## BM25
 

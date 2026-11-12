@@ -28,7 +28,7 @@ Open http://127.0.0.1:8000. The first dense query downloads `all-MiniLM-L6-v2` (
 | Where | How |
 |---|---|
 | **UI** | *Ask* and *Evaluation* tabs: tick `dense`, `BM25`, `concept graph`. Graph is disabled on the own corpus (Kestrel only) and until `app/graph_retriever.py` exists. |
-| **API** | `POST /api/ask` and `POST /api/evaluate` accept `"retrievers": ["dense","bm25","graph"]` (any subset), plus `rrf_k` (default 60) and `candidates` (default 30: how many results each retriever gives to the fusion). `GET /api/config` lists what is available. |
+| **API** | `POST /api/ask` and `POST /api/evaluate` accept `"retrievers": ["dense","bm25","graph"]` (any subset), plus `rrf_k` (default 60) and `candidates` (default 10: how many results each retriever gives to the fusion, see DECISIONS D-18). `GET /api/config` lists what is available. |
 | **Command line** | `--retrievers dense,bm25,graph` (see below) |
 
 One retriever on: its own ranking. Several on: **RRF** over their lists, `score = Σ weight / (k + rank)`.

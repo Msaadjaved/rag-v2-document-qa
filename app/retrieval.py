@@ -86,7 +86,7 @@ def retrieve(
     overlap: int,
     retrievers: list[str],
     depth: int = 5,
-    candidates: int = 30,
+    candidates: int = 10,
     rrf_k: int = 60,
     weights: dict[str, float] | None = None,
     strict_dense: bool = False,

@@ -279,7 +279,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--chunk-size", type=int, default=None, help="default: V2 final value per corpus")
         p.add_argument("--overlap", type=int, default=None, help="default: V2 final value per corpus")
         p.add_argument("--rrf-k", type=int, default=60)
-        p.add_argument("--candidates", type=int, default=30, help="how many results each retriever gives to the fusion")
+        p.add_argument("--candidates", type=int, default=10, help="how many results each retriever gives to the fusion (D-18)")
         p.add_argument("--ids", default=None, help="only these question ids, e.g. q01,q02,q03 (V2 sanity check: q01..q10)")
         p.add_argument("--generate", action="store_true", help="also generate answers (LLM calls)")
         p.add_argument("--allow-tfidf-fallback", action="store_true")

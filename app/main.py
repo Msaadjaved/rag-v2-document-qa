@@ -61,7 +61,7 @@ class AskRequest(BaseModel):
     # Which retrievers are switched on. Several on => RRF fusion.
     retrievers: list[RetrieverName] = Field(default_factory=default_retrievers)
     rrf_k: int = Field(default=60, ge=1, le=1000)
-    candidates: int = Field(default=30, ge=1, le=200)
+    candidates: int = Field(default=10, ge=1, le=200)
 
 
 class EvalRequest(BaseModel):
@@ -72,7 +72,7 @@ class EvalRequest(BaseModel):
     generate_answers: bool = False
     retrievers: list[RetrieverName] = Field(default_factory=default_retrievers)
     rrf_k: int = Field(default=60, ge=1, le=1000)
-    candidates: int = Field(default=30, ge=1, le=200)
+    candidates: int = Field(default=10, ge=1, le=200)
     # True: fail instead of silently measuring TF-IDF when MiniLM cannot load.
     strict_dense: bool = False
 

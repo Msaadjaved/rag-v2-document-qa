@@ -152,7 +152,7 @@ def evaluate_corpus(
     retrievers: list[str],
     generate_answers: bool = False,
     rrf_k: int = 60,
-    candidates: int = 30,
+    candidates: int = 10,
     weights: dict[str, float] | None = None,
     strict_dense: bool = False,
     label: str | None = None,
