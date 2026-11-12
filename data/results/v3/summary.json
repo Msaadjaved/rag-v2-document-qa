@@ -13,7 +13,7 @@
         "overlap": 10,
         "top_k": 10,
         "rrf_k": 60,
-        "candidates": 30,
+        "candidates": 10,
         "weights": null,
         "dense_backend": "sentence-transformers",
         "bm25_stopwords": null,
@@ -113,18 +113,18 @@
       "index": {
         "dense": {
           "backend": "sentence-transformers",
-          "build_seconds": 42.11878710007295,
-          "embedding_cache_hit": false
+          "build_seconds": 22.640503900009207,
+          "embedding_cache_hit": true
         }
       },
       "cost_per_question": {
-        "retrieval_ms": 31.16261668037623,
-        "latency_ms": 31.16261668037623,
+        "retrieval_ms": 16.409683332312852,
+        "latency_ms": 16.409683332312852,
         "llm_calls": 0.0,
         "prompt_tokens": 0.0,
         "completion_tokens": 0.0
       },
-      "wall_seconds": 42.51998670003377
+      "wall_seconds": 22.902259499998763
     }
   },
   {
@@ -142,7 +142,7 @@
         "overlap": 10,
         "top_k": 10,
         "rrf_k": 60,
-        "candidates": 30,
+        "candidates": 10,
         "weights": null,
         "dense_backend": "sentence-transformers",
         "bm25_stopwords": true,
@@ -152,14 +152,14 @@
       "answerable_questions": 10,
       "hit_rates": {
         "hit_rate_at_1": 0.5,
-        "hit_rate_at_3": 0.8,
-        "hit_rate_at_5": 0.9,
+        "hit_rate_at_3": 0.9,
+        "hit_rate_at_5": 1.0,
         "hit_rate_at_10": 1.0
       },
       "recall": {
         "recall_at_1": 0.31666666666666665,
-        "recall_at_3": 0.5416666666666667,
-        "recall_at_5": 0.6916666666666667,
+        "recall_at_3": 0.6416666666666667,
+        "recall_at_5": 0.7916666666666667,
         "recall_at_10": 0.9166666666666666
       },
       "hit_rate_at_k": 1.0,
@@ -192,12 +192,12 @@
         "vocabulary": {
           "count": 1,
           "hit_rate_at_1": 0.0,
-          "hit_rate_at_3": 0.0,
-          "hit_rate_at_5": 0.0,
+          "hit_rate_at_3": 1.0,
+          "hit_rate_at_5": 1.0,
           "hit_rate_at_10": 1.0,
           "recall_at_1": 0.0,
-          "recall_at_3": 0.0,
-          "recall_at_5": 0.0,
+          "recall_at_3": 1.0,
+          "recall_at_5": 1.0,
           "recall_at_10": 1.0,
           "total": 1
         },
@@ -242,24 +242,24 @@
       "index": {
         "dense": {
           "backend": "sentence-transformers",
-          "build_seconds": 42.11878710007295,
-          "embedding_cache_hit": false
+          "build_seconds": 22.640503900009207,
+          "embedding_cache_hit": true
         },
         "bm25": {
-          "source": "built",
-          "build_seconds": 0.03167130006477237,
+          "source": "disk",
+          "build_seconds": 2.320006024092436e-05,
           "terms": 961,
           "stopwords": true
         }
       },
       "cost_per_question": {
-        "retrieval_ms": 40.492066667259984,
-        "latency_ms": 40.492066667259984,
+        "retrieval_ms": 15.243333318115523,
+        "latency_ms": 15.243333318115523,
         "llm_calls": 0.0,
         "prompt_tokens": 0.0,
         "completion_tokens": 0.0
       },
-      "wall_seconds": 0.5577845999505371
+      "wall_seconds": 0.20350319996941835
     }
   },
   {
@@ -276,7 +276,7 @@
         "overlap": 20,
         "top_k": 10,
         "rrf_k": 60,
-        "candidates": 30,
+        "candidates": 10,
         "weights": null,
         "dense_backend": "sentence-transformers",
         "bm25_stopwords": null,
@@ -364,18 +364,18 @@
       "index": {
         "dense": {
           "backend": "sentence-transformers",
-          "build_seconds": 3.0751434999983758,
-          "embedding_cache_hit": false
+          "build_seconds": 0.01990509999450296,
+          "embedding_cache_hit": true
         }
       },
       "cost_per_question": {
-        "retrieval_ms": 29.20413332564446,
-        "latency_ms": 29.20413332564446,
+        "retrieval_ms": 20.04343332373537,
+        "latency_ms": 20.04343332373537,
         "llm_calls": 0.0,
         "prompt_tokens": 0.0,
         "completion_tokens": 0.0
       },
-      "wall_seconds": 3.437982500065118
+      "wall_seconds": 0.26749420003034174
     }
   },
   {
@@ -393,7 +393,7 @@
         "overlap": 20,
         "top_k": 10,
         "rrf_k": 60,
-        "candidates": 30,
+        "candidates": 10,
         "weights": null,
         "dense_backend": "sentence-transformers",
         "bm25_stopwords": true,
@@ -481,24 +481,24 @@
       "index": {
         "dense": {
           "backend": "sentence-transformers",
-          "build_seconds": 3.0751434999983758,
-          "embedding_cache_hit": false
+          "build_seconds": 0.01990509999450296,
+          "embedding_cache_hit": true
         },
         "bm25": {
-          "source": "built",
-          "build_seconds": 0.0407832000637427,
+          "source": "disk",
+          "build_seconds": 1.2100092135369778e-05,
           "terms": 982,
           "stopwords": true
         }
       },
       "cost_per_question": {
-        "retrieval_ms": 30.426458358609427,
-        "latency_ms": 30.426458358609427,
+        "retrieval_ms": 13.027108342309171,
+        "latency_ms": 13.027108342309171,
         "llm_calls": 0.0,
         "prompt_tokens": 0.0,
         "completion_tokens": 0.0
       },
-      "wall_seconds": 0.428448099992238
+      "wall_seconds": 0.17603630002122372
     }
   }
 ]
