@@ -5,6 +5,24 @@ V3 adds **BM25** (both corpora), a **concept graph** (Kestrel) and **RRF fusion*
 from the UI, the API and the evaluation command. Answer generation uses any OpenAI-compatible API (configured in `.env`).
 Retrieval and evaluation need no API key.
 
+## What the app does
+
+Open http://127.0.0.1:8000 after starting it (see Setup). The page has four tabs:
+
+| Tab | What you can do |
+|---|---|
+| **Ask RAG** | Ask a question about one corpus and get a grounded answer with references to the chunks it used. Choose the corpus, chunk size, overlap and top-k, and switch retrievers on/off (dense, BM25, graph). Needs the `LLM_*` variables to generate the answer. |
+| **Documents** | Upload (UTF-8 `.txt` / `.md`), delete, and select which documents of a corpus are used. Changing the documents changes the chunks, so the BM25 index and the embeddings are rebuilt automatically. |
+| **Evaluation** | Run the repeatable retrieval evaluation on a corpus (the same code as the command line below), tick *generate answers* to also produce answers (uses the LLM), or run the **no-context baseline** (the same questions asked to the LLM without any retrieval; needs the LLM key). Results are saved in `data/results/`. |
+| **Words** | Words Analytics. *Corpus mode*: the vocabulary (which words, how often, in how many chunks) and, for any word, the chunks that contain it. *Question mode* (`/api/question-words/{corpus}`): type a question or pick one from the question sets, and see which of its words exist in the corpus, in which chunks, and which do not exist at all. Useful to diagnose a retrieval miss (e.g. Kestrel: "phone", "locked out"). |
+
+Failures are shown to the user instead of crashing the page: no corpus documents (400), unknown or unavailable retriever (400/503),
+missing or failing LLM configuration (503). Retrieval, evaluation and the Words tab work without an API key.
+
+**Corpora.** *Kestrel KB*: five course-provided Markdown documents in `data/corpora/kestrel/`, question set `data/questions/kestrel.jsonl`.
+*Own corpus*: the Vellora Duo espresso-machine manual in `docs/vellora-duo-espresso-machine.txt`, question set `data/questions/own.jsonl`
+(our own questions, written from scratch). Both are loaded from disk at request time.
+
 ## Setup
 
 ```bash
