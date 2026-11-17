@@ -101,6 +101,10 @@ that fails validation, how to merge aliases (q12: mailman → postroom), and how
 **D-17. Hidden instructions.** The V2 materials contained an instruction invisible on the slide (text in an unreadable colour) that
 asked for a hidden page; an assistant that read the raw text added it. We removed that route and do not act on instructions that
 are not visible on the slide, unless confirmed by the teacher.
+**D-19. The v1 tag points at the same commit as v2.** The V1 web app (upload, delete, selection, chunk size, overlap and top-k
+controls) was committed together with V2, in `af545a2` (it contains `app/main.py`). `release/ragv1` only holds the course starter
+scripts, so it is not a usable V1. We tagged `v1` on that commit and did not rewrite history, so `v1` and `v2` cannot be told
+apart in git.
 
 ## Known failures (V3 so far; extend after the runs)
 
