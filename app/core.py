@@ -419,7 +419,9 @@ def generate_answer_with_usage(
 
     client = OpenAI(
         base_url=base_url,
-        api_key=api_key
+        api_key=api_key,
+        timeout=60,      # fail with a clear error instead of hanging for minutes
+        max_retries=1
     )
 
     context = "\n\n".join(
@@ -460,7 +462,12 @@ def generate_answer_with_usage(
         "latency_s": time.perf_counter() - started
     }
 
-    content = response.choices[0].message.content or "{}"
+    content = (response.choices[0].message.content or "{}").strip()
+
+    # Some models wrap their JSON in a ```json ... ``` fence: remove it.
+    if content.startswith("```"):
+        content = content.split("\n", 1)[1] if "\n" in content else ""
+        content = content.rsplit("```", 1)[0].strip()
 
     try:
         data = json.loads(content)
